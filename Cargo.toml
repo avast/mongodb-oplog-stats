@@ -1,0 +1,21 @@
+[package]
+authors = ["Petr Zemek <petr.zemek@avast.com>"]
+description = "Obtaining of statistics about a replica-set oplog if a MongoDB database"
+edition = "2018"
+keywords = ["database", "mongodb", "oplog", "replication", "statistics"]
+license = "MIT"
+name = "mongodb-oplog-stats"
+readme = "README.md"
+repository = "https://github.com/avast/mongodb-oplog-stats"
+version = "0.1.0"
+
+[dependencies]
+bson = "0.14.1"
+chrono = "0.4.11"
+clap = "2.33.0"
+failure = "0.1.7"
+humansize = "1.1.0"
+indicatif = "0.14.0"
+mongodb = "0.9.2"
+prettytable-rs = "0.8.0"
+rpassword = "4.0.5"
