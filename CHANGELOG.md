@@ -2,6 +2,10 @@
 
 ## dev
 
+* -
+
+## v0.2.0 (2022-05-18)
+
 * Fixed a panic when establishing a MongoDB connection
   ([#1](https://github.com/avast/mongodb-oplog-stats/issues/1)).
 * Updated dependencies to their latest versions
