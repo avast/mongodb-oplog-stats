@@ -2,11 +2,9 @@
 
 use std::collections::HashMap;
 
-use bson::ordered::OrderedDocument;
+use bson::Document;
 use failure::ResultExt;
-use humansize;
 use humansize::FileSize;
-use prettytable;
 use prettytable::cell;
 use prettytable::row;
 use prettytable::Table;
@@ -57,7 +55,7 @@ impl OplogStats {
     }
 
     /// Updates the statistics with the given oplog document.
-    pub fn update(&mut self, doc: &OrderedDocument) -> Result<()> {
+    pub fn update(&mut self, doc: &Document) -> Result<()> {
         let doc_size = self
             .doc_size(doc)
             .context("failed to get the size of a document")?;
@@ -119,15 +117,15 @@ impl OplogStats {
     }
 
     /// Returns the size of the given document.
-    fn doc_size(&self, doc: &OrderedDocument) -> Result<u64> {
+    fn doc_size(&self, doc: &Document) -> Result<u64> {
         let mut bytes = Vec::new();
-        bson::encode_document(&mut bytes, doc)
-            .context("failed to encode document into BSON to compute its size")?;
+        doc.to_writer(&mut bytes)
+            .context("failed to serialize document into bytes to compute its size")?;
         Ok(bytes.len() as u64)
     }
 
     /// Returns the name of an entry for the given oplog document.
-    fn entry_name_for_doc(&self, doc: &OrderedDocument) -> Result<OplogEntryName> {
+    fn entry_name_for_doc(&self, doc: &Document) -> Result<OplogEntryName> {
         // Database and collection which the oplog entry applies to.
         let ns = doc
             .get_str("ns")

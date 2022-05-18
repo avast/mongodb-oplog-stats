@@ -1,10 +1,8 @@
 //! Parsing of arguments for the tool.
 
-use clap::value_t;
-use clap::App;
 use clap::Arg;
 use clap::ArgMatches;
-use rpassword;
+use clap::Command;
 
 use crate::error::Result;
 
@@ -35,12 +33,12 @@ pub struct Args {
 
 /// Parses tool arguments.
 pub fn parse_args() -> Result<Args> {
-    let matches = App::new("mongodb-oplog-stats")
+    let matches = Command::new("mongodb-oplog-stats")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Prints statistics about MongoDB oplog")
         .arg(
-            Arg::with_name("host")
-                .short("h")
+            Arg::new("host")
+                .short('h')
                 .long("host")
                 .value_name("host")
                 .help("Resolvable hostname for the MongoDB instance to which to connect")
@@ -49,7 +47,7 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(1)
         )
         .arg(
-            Arg::with_name("port")
+            Arg::new("port")
                 .long("port")
                 .value_name("port")
                 .help("TCP port on which the MongoDB instance listens for client connections")
@@ -58,8 +56,8 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(2)
         )
         .arg(
-            Arg::with_name("username")
-                .short("u")
+            Arg::new("username")
+                .short('u')
                 .long("username")
                 .value_name("username")
                 .help("Username with which to authenticate to a MongoDB database that uses authentication")
@@ -67,8 +65,8 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(3)
         )
         .arg(
-            Arg::with_name("password")
-                .short("p")
+            Arg::new("password")
+                .short('p')
                 .long("password")
                 .value_name("password")
                 .help("Password with which to authenticate to a MongoDB database that uses authentication")
@@ -77,7 +75,7 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(4)
         )
         .arg(
-            Arg::with_name("auth_db")
+            Arg::new("auth_db")
                 .long("authenticationDatabase")
                 .value_name("dbname")
                 .help("Authentication database where the specified --username has been created")
@@ -86,8 +84,8 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(5)
         )
         .arg(
-            Arg::with_name("limit")
-                .short("l")
+            Arg::new("limit")
+                .short('l')
                 .long("limit")
                 .value_name("n")
                 .help("Maximal number of documents in the oplog to process")
@@ -95,7 +93,7 @@ pub fn parse_args() -> Result<Args> {
                 .display_order(6)
         )
         .arg(
-            Arg::with_name("print_after")
+            Arg::new("print_after")
                 .long("printAfter")
                 .value_name("n")
                 .help("Print statistics every time n documents have been processed")
@@ -124,7 +122,7 @@ pub fn parse_args() -> Result<Args> {
 
 fn get_limit(matches: &ArgMatches) -> Result<Option<u64>> {
     if matches.is_present("limit") {
-        Ok(Some(value_t!(matches.value_of("limit"), u64)?))
+        Ok(Some(matches.value_of_t("limit")?))
     } else {
         Ok(None)
     }
@@ -132,11 +130,11 @@ fn get_limit(matches: &ArgMatches) -> Result<Option<u64>> {
 
 fn get_print_after(matches: &ArgMatches) -> Result<Option<u64>> {
     if matches.is_present("print_after") {
-        let print_after = value_t!(matches.value_of("print_after"), u64)?;
+        let print_after = matches.value_of_t("print_after")?;
         if print_after == 0 {
-            clap::Error::with_description(
-                "Value of --printAfter has to be positive",
+            clap::error::Error::raw(
                 clap::ErrorKind::InvalidValue,
+                "Value of --printAfter has to be positive".to_string(),
             )
             .exit()
         }
@@ -154,7 +152,7 @@ fn get_host(matches: &ArgMatches) -> String {
 }
 
 fn get_port(matches: &ArgMatches) -> Result<u16> {
-    Ok(value_t!(matches.value_of("port"), u16)?)
+    Ok(matches.value_of_t("port")?)
 }
 
 fn get_username(matches: &ArgMatches) -> Option<String> {
@@ -164,7 +162,7 @@ fn get_username(matches: &ArgMatches) -> Option<String> {
 fn get_password(matches: &ArgMatches, username_given: bool) -> Result<Option<String>> {
     let mut password = matches.value_of("password").map(String::from);
     if username_given && (password.is_none() || password == Some(String::new())) {
-        password = Some(rpassword::read_password_from_tty(Some("Password: "))?);
+        password = Some(rpassword::prompt_password("Password: ")?);
     }
     Ok(password)
 }

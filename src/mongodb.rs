@@ -1,15 +1,15 @@
 //! Access to MongoDB.
 
-use bson;
 use bson::doc;
+use bson::Document;
 use failure::ResultExt;
-use mongodb::options::auth::Credential;
 use mongodb::options::ClientOptions;
+use mongodb::options::Credential;
 use mongodb::options::FindOptions;
-use mongodb::options::StreamAddress;
-use mongodb::Client;
-use mongodb::Collection;
-use mongodb::Cursor;
+use mongodb::options::ServerAddress;
+use mongodb::sync::Client;
+use mongodb::sync::Collection;
+use mongodb::sync::Cursor;
 
 use crate::args::Args;
 use crate::error::Result;
@@ -33,8 +33,8 @@ impl MongoDB {
                         .source(args.auth_db.clone())
                         .build(),
                 ))
-                .hosts(vec![StreamAddress {
-                    hostname: args.host.clone(),
+                .hosts(vec![ServerAddress::Tcp {
+                    host: args.host.clone(),
                     port: Some(args.port),
                 }])
                 .build(),
@@ -57,10 +57,10 @@ impl MongoDB {
     /// # Arguments
     ///
     /// * `limit` - The maximum number of documents to return.
-    pub fn generate_documents_in_oplog(&self, limit: u64) -> Result<Cursor> {
+    pub fn generate_documents_in_oplog(&self, limit: u64) -> Result<Cursor<Document>> {
         let find_options = FindOptions::builder()
             .limit(limit as i64)
-            .sort(doc! {"$natural": -1})
+            .sort(doc! {"$natural": -1i32})
             .build();
         let oplog = self.get_oplog_collection();
         let cursor = oplog
@@ -70,7 +70,7 @@ impl MongoDB {
     }
 
     /// Returns access to the collection representing the oplog.
-    fn get_oplog_collection(&self) -> Collection {
+    fn get_oplog_collection(&self) -> Collection<Document> {
         let db = self.client.database("local");
         db.collection("oplog.rs")
     }

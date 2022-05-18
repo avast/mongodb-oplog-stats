@@ -8,15 +8,15 @@ use failure::ResultExt;
 use indicatif::ProgressBar;
 
 mod args;
-mod mongodb;
 mod error;
+mod mongodb;
 mod oplog_stats;
 mod utils;
 
 use crate::args::parse_args;
-use crate::mongodb::MongoDB;
 use crate::error::print_error;
 use crate::error::Result;
+use crate::mongodb::MongoDB;
 use crate::oplog_stats::OplogStats;
 
 /// Returns the document limit to use for querying the oplog and generating
