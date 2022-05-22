@@ -2,7 +2,8 @@
 
 ## dev
 
-* -
+* Added support for connecting to MongoDB databases with disabled
+  authentication ([#2](https://github.com/avast/mongodb-oplog-stats/issues/2)).
 
 ## v0.2.0 (2022-05-18)
 
