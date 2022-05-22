@@ -24,15 +24,24 @@ pub struct MongoDB {
 impl MongoDB {
     /// Creates an access to a MongoDB instance from the tool arguments.
     pub fn from_args(args: &Args) -> Result<Self> {
+        // Use authentication credential only if authentication has been
+        // requested by passing a username. This allows us to connect to
+        // databases that have disabled authentication.
+        let credential = if args.username.is_some() {
+            Some(
+                Credential::builder()
+                    .username(args.username.clone())
+                    .password(args.password.clone())
+                    .source(args.auth_db.clone())
+                    .build(),
+            )
+        } else {
+            None
+        };
+
         let client = Client::with_options(
             ClientOptions::builder()
-                .credential(Some(
-                    Credential::builder()
-                        .username(args.username.clone())
-                        .password(args.password.clone())
-                        .source(args.auth_db.clone())
-                        .build(),
-                ))
+                .credential(credential)
                 .hosts(vec![ServerAddress::Tcp {
                     host: args.host.clone(),
                     port: Some(args.port),
