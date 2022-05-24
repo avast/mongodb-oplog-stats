@@ -55,7 +55,20 @@ fn obtain_oplog_stats(
 ) -> Result<()> {
     let pbar = ProgressBar::new(limit);
     for result in mongodb.generate_documents_in_oplog(limit)? {
-        let doc = result.context("failed to get a document from the oplog")?;
+        // Gracefully handle cases when a document cannot be retrieved from the
+        // oplog (e.g. due to invalid UTF-8 sequences, see #3) by skipping such
+        // documents.
+        let doc = match result {
+            Ok(doc) => doc,
+            Err(err) => {
+                eprintln!(
+                    "warning: failed to retrieve a document from the oplog ({}); skipping",
+                    err
+                );
+                continue;
+            }
+        };
+
         oplog_stats
             .update(&doc)
             .context("failed to add info from an oplog document")?;
