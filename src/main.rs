@@ -112,7 +112,7 @@ fn run() -> Result<()> {
         }
         Err(err) => {
             if oplog_stats.processed_at_least_one_doc() {
-                println!("Obtaining failed; showing last stats:");
+                println!("Obtaining failed; showing the last stats:");
                 oplog_stats.print();
             }
             Err(err)
