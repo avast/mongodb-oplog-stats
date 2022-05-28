@@ -78,7 +78,7 @@ impl MongoDB {
         Ok(cursor)
     }
 
-    /// Returns access to the collection representing the oplog.
+    /// Returns access to the oplog.
     fn get_oplog_collection(&self) -> Collection<Document> {
         let db = self.client.database("local");
         db.collection("oplog.rs")
