@@ -2,6 +2,8 @@
 
 ## dev
 
+* Skip documents that cannot be retrieved from the oplog
+  ([#3](https://github.com/avast/mongodb-oplog-stats/issues/3)).
 * Added support for connecting to MongoDB databases with disabled
   authentication ([#2](https://github.com/avast/mongodb-oplog-stats/issues/2)).
 
