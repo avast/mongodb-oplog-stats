@@ -2,6 +2,10 @@
 
 ## dev
 
+* -
+
+## v0.3.0 (2022-06-07)
+
 * Skip documents that cannot be retrieved from the oplog
   ([#3](https://github.com/avast/mongodb-oplog-stats/issues/3)).
 * Added support for connecting to MongoDB databases with disabled
